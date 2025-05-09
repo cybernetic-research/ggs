@@ -2,7 +2,7 @@ extends Node3D
 
 @onready var camera = get_node("Camera")
 @onready var screen_texture = get_node("TextureRect")
-@export var splat_filename: String = "train.ply"
+@export var splat_filename: String = "nuts.ply"
 
 var rd = RenderingServer.get_rendering_device()
 var pipeline: RID

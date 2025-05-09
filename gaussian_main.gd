@@ -7,8 +7,8 @@ extends Node3D
 #	lightning0 implementation
 #
 #
-var splatPointCount : int = 0
-var splatProperties : Array[String] = []
+var num_vertex : int = 0
+var num_properties : Array[String] = []
 var splatPoints : Array = []
 var splatAsFile : FileAccess
 var xPos : int
@@ -37,7 +37,6 @@ var splatMultiMesh : MultiMesh
 var rd = RenderingServer.get_rendering_device()
 var pipeline: RID
 var shader: RID
-var vertex_format: int
 var blend := RDPipelineColorBlendState.new()
 var framebuffer: RID
 var vertex_array: RID
@@ -68,7 +67,6 @@ var visible_counter_uniform: RDUniform
 var cull_pipeline: RID
 var cull_shader: RID
 var visible_count: int = 0
-var num_vertex: int
 var output_tex: RID
 var display_texture:Texture2DRD
 var camera_matrices_buffer: RID
@@ -106,34 +104,31 @@ func load_ply_data_lightning0(path : String):
 		print(splatLine)
 		
 		if splatLine.begins_with("element vertex "):
-			splatPointCount = int(splatLine.replace("element vertex ", ""))
+			num_vertex = int(splatLine.replace("element vertex ", ""))
 		
 		if splatLine.begins_with("property float "):
-			splatProperties.append(splatLine.replace("property float ", ""))
+			num_properties.append(splatLine.replace("property float ", ""))
 		
-	splatMultiMesh.instance_count = splatPointCount
+	splatMultiMesh.instance_count = num_vertex
 	
-	#addAllPoints()
-	#createMultiMesh()
+	xPos = num_properties.find("x")
+	yPos = num_properties.find("y")
+	zPos = num_properties.find("z")
 	
-	xPos = splatProperties.find("x")
-	yPos = splatProperties.find("y")
-	zPos = splatProperties.find("z")
+	xScale = num_properties.find("scale_0")
+	yScale = num_properties.find("scale_1")
+	zScale = num_properties.find("scale_2")
 	
-	xScale = splatProperties.find("scale_0")
-	yScale = splatProperties.find("scale_1")
-	zScale = splatProperties.find("scale_2")
+	rot0 = num_properties.find("rot_0")
+	rot1 = num_properties.find("rot_1")
+	rot2 = num_properties.find("rot_2")
+	rot3 = num_properties.find("rot_3")
 	
-	rot0 = splatProperties.find("rot_0")
-	rot1 = splatProperties.find("rot_1")
-	rot2 = splatProperties.find("rot_2")
-	rot3 = splatProperties.find("rot_3")
+	r = num_properties.find("f_dc_0")
+	g = num_properties.find("f_dc_1")
+	b = num_properties.find("f_dc_2")
 	
-	r = splatProperties.find("f_dc_0")
-	g = splatProperties.find("f_dc_1")
-	b = splatProperties.find("f_dc_2")
-	
-	opacity = splatProperties.find("opacity")
+	opacity = num_properties.find("opacity")
 	
 	var thread : Thread
 	thread = Thread.new()
@@ -142,9 +137,9 @@ func load_ply_data_lightning0(path : String):
 func loadPointAndCreateMesh():
 	var count : int = 0
 	splatMultiMesh.visible_instance_count = 0
-	while count < splatPointCount:
+	while count < num_vertex:
 		var newSplat : Array[float] = []
-		for property in splatProperties:
+		for property in num_properties:
 			newSplat.append(splatAsFile.get_float())
 		splatPoints.append(newSplat)
 		
@@ -189,7 +184,7 @@ func loadPointAndCreateMesh():
 		
 		count += 1
 		if count % 10000 == 0:
-			print(str(round((float(count)/float(splatPointCount))*100)) + "%" + " (" + str(count) + "/" + str(splatPointCount) + ")")
+			print(str(round((float(count)/float(num_vertex))*100)) + "%" + " (" + str(count) + "/" + str(num_vertex) + ")")
 	
 	splatAsFile.close()
 	print("finished")

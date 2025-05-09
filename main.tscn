@@ -52,9 +52,10 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="MultiMeshInstance3Dref" type="MultiMeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.301253, -2.34556)
+transform = Transform3D(1, -8.74228e-08, -8.74228e-08, -8.74228e-08, -1, 0, -8.74228e-08, 7.64274e-15, -1, 0, -0.301253, -2.34556)
 multimesh = SubResource("MultiMesh_0xm2m")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.27615)
+visible = false
 mesh = SubResource("BoxMesh_h2yge")

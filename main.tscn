@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c27tc42js165g"]
+[gd_scene load_steps=9 format=3 uid="uid://c27tc42js165g"]
 
 [ext_resource type="Script" uid="uid://bgdkbghbt6gom" path="res://gaussian_main.gd" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://domgsjmlsykpc" path="res://Camera.gd" id="2_ppc5i"]
@@ -16,19 +16,15 @@ sky = SubResource("Sky_h2yge")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="PointMesh" id="PointMesh_0xm2m"]
-
-[sub_resource type="MultiMesh" id="MultiMesh_0xm2m"]
-transform_format = 1
-use_colors = true
-use_custom_data = true
-mesh = SubResource("PointMesh_0xm2m")
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0xm2m"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_h2yge"]
 material = SubResource("StandardMaterial3D_0xm2m")
 size = Vector3(2, 2, 2)
+
+[sub_resource type="MultiMesh" id="MultiMesh_0xm2m"]
+transform_format = 1
+use_colors = true
 
 [node name="main" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.56234)
@@ -51,11 +47,11 @@ visible = false
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="MultiMeshInstance3Dref" type="MultiMeshInstance3D" parent="."]
-transform = Transform3D(1, -8.74228e-08, -8.74228e-08, -8.74228e-08, -1, 0, -8.74228e-08, 7.64274e-15, -1, 0, -0.301253, -2.34556)
-multimesh = SubResource("MultiMesh_0xm2m")
-
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.27615)
 visible = false
 mesh = SubResource("BoxMesh_h2yge")
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
+visible = false
+multimesh = SubResource("MultiMesh_0xm2m")

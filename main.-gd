@@ -133,7 +133,13 @@ func _ready():
 
 	print("unpacking .ply file data...")
 	_load_ply_file()	
-	
+	configure_shaders()
+
+
+
+
+
+func configure_shaders(): 
 	print("configuring shaders...")
 	var vertices_buffer = rd.storage_buffer_create(vertices.size() * 4, vertices.to_byte_array())
 	

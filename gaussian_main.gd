@@ -78,27 +78,58 @@ var vertices: PackedFloat32Array
 const NUM_BLOCKS_PER_WORKGROUP = 1024
 var NUM_WORKGROUPS
 
+#
+#
+# intermediate
+#
+#
+var num_properties = 0
 
 
-
-
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	init_lightning0()
-#	init_haztr0()
-	
+
 
 func init_lightning0():
-	splatMultiMesh = $MultiMeshInstance3Dref.multimesh
-	load_ply_data_lightning0(splat_filename)
+	# Create a new MultiMeshInstance3D node
+	var multi_mesh_instance = MultiMeshInstance3D.new()
+	add_child(multi_mesh_instance)  # Add it to the current node
 
+	# Create and configure the MultiMesh
+	splatMultiMesh = MultiMesh.new()
+	splatMultiMesh.use_colors = true  # Enable per-instance colors
+	splatMultiMesh.transform_format = MultiMesh.TRANSFORM_3D  # Set the transform format
+
+	# Create a new PointMesh
+	var point_mesh = ArrayMesh.new()
+	var arrays = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array([Vector3(0, 0, 0)])  # Single point at origin
+	point_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_POINTS, arrays)
+
+	# Assign the PointMesh to the MultiMesh
+	splatMultiMesh.mesh = point_mesh
+
+	# Assign the MultiMesh to the MultiMeshInstance3D
+	multi_mesh_instance.multimesh = splatMultiMesh
+
+	# Optionally configure other properties of the MultiMeshInstance3D
+	multi_mesh_instance.transform = Transform3D.IDENTITY  # Set its transform if needed
+	
+	# Load the PLY data
+	load_ply_data_lightning0(splat_filename)
+	# Apply a 180-degree rotation around the Y-axis to the entire MultiMeshInstance3D
+	var rotation_y = Transform3D(Basis(Vector3(0, 1, 0), PI))  # 180 degrees around X-axis
+	multi_mesh_instance.transform *= rotation_y
+	var rotation_z = Transform3D(Basis(Vector3(0, 0, 1), PI))  # 180 degrees around X-axis
+	multi_mesh_instance.transform *= rotation_z
 
 func load_ply_data_lightning0(path : String):
 	splatMultiMesh.instance_count = 0
 	
 	splatAsFile = FileAccess.open(path, FileAccess.READ)
 	
-	var num_properties = 0
+	num_properties = 0
 	var line = splatAsFile.get_line()
 	while line != "end_header":
 		line = splatAsFile.get_line()
@@ -143,6 +174,7 @@ func load_ply_data_lightning0(path : String):
 	var thread : Thread
 	thread = Thread.new()
 	thread.start(loadPointAndCreateMesh)
+
 
 func loadPointAndCreateMesh():
 	var count : int = 0
@@ -196,5 +228,6 @@ func loadPointAndCreateMesh():
 		if count % 10000 == 0:
 			print(str(round((float(count)/float(num_vertex))*100)) + "%" + " (" + str(count) + "/" + str(num_vertex) + ")")
 	
+	vertices = splatAsFile.get_buffer(num_vertex * num_properties * 4).to_float32_array()
 	splatAsFile.close()
 	print("finished")

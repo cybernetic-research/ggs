@@ -8,7 +8,7 @@ extends Node3D
 #
 #
 var num_vertex : int = 0
-var num_properties : Array[String] = []
+var splatProperties : Array[String] = []
 var splatPoints : Array = []
 var splatAsFile : FileAccess
 var xPos : int
@@ -98,37 +98,47 @@ func load_ply_data_lightning0(path : String):
 	
 	splatAsFile = FileAccess.open(path, FileAccess.READ)
 	
-	var splatLine = splatAsFile.get_line()
-	while splatLine != "end_header":
-		splatLine = splatAsFile.get_line()
-		print(splatLine)
+	var num_properties = 0
+	var line = splatAsFile.get_line()
+	while line != "end_header":
+		line = splatAsFile.get_line()
+		print(line)
+		if line.begins_with("element vertex"):
+			num_vertex = int(line.split(" ")[2])
 		
-		if splatLine.begins_with("element vertex "):
-			num_vertex = int(splatLine.replace("element vertex ", ""))
+		elif line.begins_with("property float "):
+			splatProperties.append(line.replace("property float ", ""))
+			num_properties += 1
+
+		elif line.begins_with("property"):
+			num_properties += 1
 		
-		if splatLine.begins_with("property float "):
-			num_properties.append(splatLine.replace("property float ", ""))
-		
+		elif line.begins_with("end_header"):
+			break
+
+	print("num splats: ", num_vertex)
+	print("num properties: ", num_properties)
+
 	splatMultiMesh.instance_count = num_vertex
 	
-	xPos = num_properties.find("x")
-	yPos = num_properties.find("y")
-	zPos = num_properties.find("z")
+	xPos = splatProperties.find("x")
+	yPos = splatProperties.find("y")
+	zPos = splatProperties.find("z")
 	
-	xScale = num_properties.find("scale_0")
-	yScale = num_properties.find("scale_1")
-	zScale = num_properties.find("scale_2")
+	xScale = splatProperties.find("scale_0")
+	yScale = splatProperties.find("scale_1")
+	zScale = splatProperties.find("scale_2")
 	
-	rot0 = num_properties.find("rot_0")
-	rot1 = num_properties.find("rot_1")
-	rot2 = num_properties.find("rot_2")
-	rot3 = num_properties.find("rot_3")
+	rot0 = splatProperties.find("rot_0")
+	rot1 = splatProperties.find("rot_1")
+	rot2 = splatProperties.find("rot_2")
+	rot3 = splatProperties.find("rot_3")
 	
-	r = num_properties.find("f_dc_0")
-	g = num_properties.find("f_dc_1")
-	b = num_properties.find("f_dc_2")
+	r = splatProperties.find("f_dc_0")
+	g = splatProperties.find("f_dc_1")
+	b = splatProperties.find("f_dc_2")
 	
-	opacity = num_properties.find("opacity")
+	opacity = splatProperties.find("opacity")
 	
 	var thread : Thread
 	thread = Thread.new()
@@ -139,7 +149,7 @@ func loadPointAndCreateMesh():
 	splatMultiMesh.visible_instance_count = 0
 	while count < num_vertex:
 		var newSplat : Array[float] = []
-		for property in num_properties:
+		for property in splatProperties:
 			newSplat.append(splatAsFile.get_float())
 		splatPoints.append(newSplat)
 		

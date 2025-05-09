@@ -174,6 +174,7 @@ func load_ply_data_lightning0(path : String):
 	var thread : Thread
 	thread = Thread.new()
 	thread.start(loadPointAndCreateMesh)
+	thread.wait_to_finish()
 
 
 func loadPointAndCreateMesh():
